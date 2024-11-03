@@ -60,7 +60,7 @@ find_library(PTHREAD_LIB NAMES libpthread.a pthread)
 find_package(Boost 1.86.0 REQUIRED)
 message("Boost_INCLUDE_DIRS '${Boost_INCLUDE_DIRS}'")
 
-project(DKUtil CXX)
+project(TypeTraits CXX)
 include_directories(
         ${Boost_INCLUDE_DIRS}
         BEFORE SYSTEM ${CMAKE_SOURCE_DIR}/include
