@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.28.3)
 project(TypeTraits
         VERSION 1.0.0
         DESCRIPTION "A header only for conversion of standard containers"
@@ -27,7 +27,7 @@ message("Linux version is '${LINUX_VERSION}'")
 
 set(COVERAGE_COMPILER_FLAGS "-g -O0 -fno-default-inline --coverage -fprofile-abs-path -fprofile-arcs -fno-inline -fno-inline-small-functions -ftest-coverage -lgcov" CACHE INTERNAL "")
 
-set(CMAKE_CXX_FLAGS "-rdynamic -Wall -Werror CACHE STRING "Default C++ compiler flags")
+set(CMAKE_CXX_FLAGS "-rdynamic -Wall -Werror" CACHE STRING "Default C++ compiler flags")
 set(CMAKE_CXX_FLAGS_DEBUG "-g" CACHE STRING "g++ debug flags")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g -O2" CACHE STRING "g++ rel+dbg flags")
 set(CMAKE_CXX_FLAGS_COVERAGE "${COVERAGE_COMPILER_FLAGS}" CACHE STRING "g++ coverage flags." FORCE)
