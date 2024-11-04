@@ -1,4 +1,10 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.29)
+project(TypeTraits
+        VERSION 1.0.0
+        DESCRIPTION "A header only for conversion of standard containers"
+        HOMEPAGE_URL "https://github.com/kingkybel/TypeTraits")
+
+include(GNUInstallDirs)
 
 if (CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
@@ -23,7 +29,7 @@ set(COVERAGE_COMPILER_FLAGS "-g -O0 -fno-default-inline --coverage -fprofile-abs
 
 set(CMAKE_CXX_FLAGS "-rdynamic -Wall -Werror -DBOOST_ALLOW_DEPRECATED_HEADERS -DBOOST_BIND_GLOBAL_PLACEHOLDERS" CACHE STRING "Default C++ compiler flags")
 set(CMAKE_CXX_FLAGS_DEBUG "-g" CACHE STRING "g++ debug flags")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g -O2" CACHE STRING "g++ rel+gbg flags")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g -O2" CACHE STRING "g++ rel+dbg flags")
 set(CMAKE_CXX_FLAGS_COVERAGE "${COVERAGE_COMPILER_FLAGS}" CACHE STRING "g++ coverage flags." FORCE)
 set(CMAKE_CXX_FLAGS_RELEASE "-O2" CACHE STRING "g++ release flags")
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -36,42 +42,27 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_EXE_LINKER_FLAGS "-static")
 
-# include(FetchContent)
-# FetchContent_Declare(
-# googletest
-# # Specify the commit you depend on and update it regularly.
-# URL https://github.com/google/googletest/archive/5376968f6948923e2411081fd9372e71a59d8e77.zip
-# )
-# set(FETCHCONTENT_QUIET OFF)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-# set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-# FetchContent_MakeAvailable(googletest)
-
-# include(FetchContent)
-# FetchContent_Declare(
-# Boost
-# GIT_REPOSITORY https://github.com/boostorg/boost.git
-# GIT_TAG boost-1.83.0
-# )
-# FetchContent_MakeAvailable(Boost)
-find_library(DL_LIB NAMES libdl.a dl)
-find_library(SSL_LIB NAMES libssl.a ssl)
-find_library(PTHREAD_LIB NAMES libpthread.a pthread)
-find_package(Boost 1.86.0 REQUIRED)
-message("Boost_INCLUDE_DIRS '${Boost_INCLUDE_DIRS}'")
-
-project(TypeTraits CXX)
 include_directories(
         ${Boost_INCLUDE_DIRS}
         BEFORE SYSTEM ${CMAKE_SOURCE_DIR}/include
         system
 )
 link_directories(
-        BEFORE SYSTEM ${CMAKE_SOURCE_DIR}/build/lib
         /usr/local/lib
         ${Boost_LIBRARY_DIR_RELEASE}
         system
 )
+
+add_library(DirectedGraphs INTERFACE)
+# Adding the install interface generator expression makes sure that the include
+# files are installed to the proper location (provided by GNUInstallDirs)
+target_include_directories(
+        DirectedGraphs
+        INTERFACE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+target_compile_features(DirectedGraphs INTERFACE cxx_std_23)
 
 add_subdirectory(test)
 
@@ -82,4 +73,3 @@ file(GLOB HEADER_FILES ${CMAKE_SOURCE_DIR}/include/*.h)
 # Install the header files directly under 'include/dkyb'
 install(FILES ${HEADER_FILES}
         DESTINATION include/dkyb)
-
