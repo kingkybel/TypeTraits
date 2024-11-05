@@ -51,7 +51,7 @@ struct is_equality_comparable<T, EqualTo, std::void_t<decltype(std::declval<T>()
 
 // Public trait for equality comparability
 template <typename T, typename EqualTo = T>
-using is_equality_comparable_t = is_equality_comparable<T, EqualTo>::type;
+using is_equality_comparable_t = typename is_equality_comparable<T, EqualTo>::type;
 
 // Public trait for equality comparability
 template <typename T, typename EqualTo = T>
@@ -72,7 +72,7 @@ struct is_less_comparable<T, LessThan, std::void_t<decltype(std::declval<T>() < 
 
 // Public trait for less-than comparability
 template <typename T, typename LessThan = T>
-using is_less_comparable_t = is_less_comparable<T, LessThan>::type;
+using is_less_comparable_t = typename is_less_comparable<T, LessThan>::type;
 
 template <typename T, typename LessThan = T>
 bool constexpr is_less_comparable_v = is_less_comparable<T, LessThan>::value;
@@ -88,7 +88,7 @@ struct is_tuple<std::tuple<T...>> : std::true_type
 };
 
 template <typename... T>
-using is_tuple_t = is_tuple<T...>::type;
+using is_tuple_t = typename is_tuple<T...>::type;
 
 template <typename... T>
 bool constexpr is_tuple_v = is_tuple<T...>::value;
@@ -146,7 +146,7 @@ struct is_char<char32_t> : std::true_type
 };
 
 template <typename T>
-using is_char_t = is_char<T>::type;
+using is_char_t = typename is_char<T>::type;
 
 template <typename T>
 bool constexpr is_char_v = is_char<T>::value;
@@ -170,7 +170,7 @@ struct is_std_string<std::basic_string<CharT, Traits, Alloc>> : std::true_type
 };
 
 template <typename T>
-using is_std_string_t = is_std_string<T>::type;
+using is_std_string_t = typename is_std_string<T>::type;
 
 template <typename T>
 bool constexpr is_std_string_v = is_std_string<T>::value;
@@ -212,7 +212,7 @@ struct is_std_string_view<std::basic_string_view<CharT, Traits>> : std::true_typ
 };
 
 template <typename T>
-using is_std_string_view_t = is_std_string_view<T>::type;
+using is_std_string_view_t = typename is_std_string_view<T>::type;
 
 template <typename T>
 bool constexpr is_std_string_view_v = is_std_string_view<T>::value;
@@ -280,7 +280,7 @@ struct is_char_pointer<CharT const* const>
 };
 
 template <typename CharT>
-using is_char_pointer_t = is_char_pointer<CharT>::type;
+using is_char_pointer_t = typename is_char_pointer<CharT>::type;
 
 template <typename CharT>
 bool constexpr is_char_pointer_v = is_char_pointer<CharT>::value;
@@ -336,7 +336,7 @@ struct is_char_array<CharT const[sz]>
 };
 
 template <typename CharT>
-using is_char_array_t = is_char_array<CharT>::type;
+using is_char_array_t = typename is_char_array<CharT>::type;
 
 template <typename CharT>
 bool constexpr is_char_array_v = is_char_array<CharT>::value;
@@ -373,7 +373,7 @@ struct is_string
 };
 
 template <typename T>
-using is_string_t = is_string<T>::type;
+using is_string_t = typename is_string<T>::type;
 
 template <typename T>
 bool constexpr is_string_v = is_string<T>::value;
@@ -409,8 +409,8 @@ struct is_compatible_string
 {
     static constexpr bool is_string_1    = is_string_v<StringT1_>;
     static constexpr bool is_string_2    = is_string_v<StringT2_>;
-    using char_type_1                    = is_string<StringT1_>::char_type;
-    using char_type_2                    = is_string<StringT2_>::char_type;
+    using char_type_1                    = typename is_string<StringT1_>::char_type;
+    using char_type_2                    = typename is_string<StringT2_>::char_type;
     static constexpr bool same_char_type = std::is_same_v<char_type_1, char_type_2>;
 
     constexpr static bool value = is_string_1 && is_string_2 && same_char_type;
@@ -418,7 +418,7 @@ struct is_compatible_string
 };
 
 template <typename StringT1_, typename StringT2_>
-using is_compatible_string_t = is_compatible_string<StringT1_, StringT2_>::type;
+using is_compatible_string_t = typename is_compatible_string<StringT1_, StringT2_>::type;
 
 template <typename StringT1_, typename StringT2_>
 bool constexpr is_compatible_string_v = is_compatible_string<StringT1_, StringT2_>::value;
@@ -427,7 +427,7 @@ template <typename StringT_, typename StringOrCharT_>
 struct has_std_string_compatible_char
 {
     // clang-format off
-    using string_char_type = is_string<StringT_>::char_type ;
+    using string_char_type = typename is_string<StringT_>::char_type ;
 
     static constexpr bool is_std_string_1st_v    = is_std_string<StringT_>::value;
     static constexpr bool is_compatible_string_v = is_compatible_string<StringT_, StringOrCharT_>::value;
@@ -440,7 +440,7 @@ struct has_std_string_compatible_char
 };
 
 template <typename StringT1_, typename StringOrCharT_>
-using has_std_string_compatible_char_t = has_std_string_compatible_char<StringT1_, StringOrCharT_>::type;
+using has_std_string_compatible_char_t = typename has_std_string_compatible_char<StringT1_, StringOrCharT_>::type;
 
 template <typename StringT1_, typename StringOrCharT_>
 bool constexpr has_std_string_compatible_char_v = has_std_string_compatible_char<StringT1_, StringOrCharT_>::value;
@@ -487,7 +487,7 @@ struct has_std_hash<Type, std::void_t<decltype(std::declval<std::hash<Type>>()(s
 };
 
 template <typename Type>
-using has_std_hash_t = has_std_hash<Type>::type;
+using has_std_hash_t = typename has_std_hash<Type>::type;
 
 // Helper variable template (for C++14 and above)
 template <typename Type>
