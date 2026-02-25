@@ -23,6 +23,7 @@
  * @author: Dieter J Kybelksties
  */
 #include "traits.h"
+#include "traits_static.h"
 
 #include <gtest/gtest.h>
 #include <string>
@@ -270,4 +271,80 @@ TEST_F(TraitsTest, has_std_hash_test)
     };
 
     ASSERT_FALSE(has_std_hash_v<NoHash>);
+}
+
+TEST_F(TraitsTest, get_Nth_type_test)
+{
+    using First = get_Nth_type<0, int, double, std::string>::type;
+    using Last  = get_Nth_type<2, int, double, std::string>::type;
+    ASSERT_TRUE((std::is_same_v<First, int>));
+    ASSERT_TRUE((std::is_same_v<Last, std::string>));
+}
+
+TEST_F(TraitsTest, charToChar_test)
+{
+    ASSERT_EQ(charToChar<char16_t>('A'), u'A');
+    ASSERT_EQ(charToChar<char>('z'), 'z');
+}
+
+TEST_F(TraitsTest, is_char_pointer_const_pointer_test)
+{
+    using const_char_ptr_const = char const * const;
+    ASSERT_TRUE((is_char_pointer_v<const_char_ptr_const>));
+}
+
+TEST_F(TraitsTest, is_char_array_bounded_test)
+{
+    ASSERT_TRUE((is_char_array_v<char[4]>));
+    ASSERT_TRUE((is_char_array_v<char const[7]>));
+}
+
+namespace
+{
+struct StaticMemberMatch
+{
+    static bool fill()
+    {
+        return true;
+    }
+};
+
+struct StaticMemberMismatch
+{
+    static double fill()
+    {
+        return 1.0;
+    }
+};
+
+struct MemberMatch
+{
+    bool fill()
+    {
+        return true;
+    }
+};
+
+struct MemberMismatch
+{
+    double fill()
+    {
+        return 1.0;
+    }
+};
+
+DEFINE_HAS_STATIC_MEMBER_FUNCTION(has_static_bool_fill, T::fill, bool (*)(void))
+DEFINE_HAS_MEMBER_FUNCTION(has_bool_fill, fill, bool (T::*)(void))
+} // namespace
+
+TEST_F(TraitsTest, has_static_member_function_macro_test)
+{
+    ASSERT_TRUE((has_static_bool_fill<StaticMemberMatch>::value));
+    ASSERT_FALSE((has_static_bool_fill<StaticMemberMismatch>::value));
+}
+
+TEST_F(TraitsTest, has_member_function_macro_test)
+{
+    ASSERT_TRUE((has_bool_fill<MemberMatch>::value));
+    ASSERT_FALSE((has_bool_fill<MemberMismatch>::value));
 }

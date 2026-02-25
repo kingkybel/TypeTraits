@@ -1,6 +1,15 @@
 # TypeTraits
 
-Useful type-traits
+Header-only C++ type-trait helpers for compile-time introspection.
+
+## Purpose
+
+This repository provides reusable trait utilities to:
+
+- detect whether operators, hashes, and member/static member functions exist with specific signatures
+- classify string-like types (`std::basic_string`, `std::basic_string_view`, character pointers, and character arrays)
+- reason about type compatibility at compile time (including character-type compatibility)
+- support generic code paths that depend on string/character semantics
 
 # Installation
 
