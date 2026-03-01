@@ -34,9 +34,33 @@
 #include <type_traits>
 #include <utility>
 
+#if __cplusplus >= 202002L
+#include <concepts>
+#endif
+
 namespace util
 {
-// Helper for equality comparability
+
+#if __cplusplus >= 202002L
+// C++20 Implementation using Concepts
+template <typename T, typename EqualTo = T>
+concept equality_comparable = requires(T a, EqualTo b) {
+    { a == b } -> std::convertible_to<bool>;
+};
+
+template <typename T, typename LessThan = T>
+concept less_comparable = requires(T a, LessThan b) {
+    { a < b } -> std::convertible_to<bool>;
+};
+
+template <typename T>
+concept is_tuple = requires {
+    typename std::tuple_size<T>::type;
+};
+
+#endif
+
+// Helper for equality comparability (C++14/17 fallback)
 template <typename T, typename EqualTo, typename = void>
 struct is_equality_comparable : std::false_type
 {
@@ -364,11 +388,11 @@ struct is_string
     // clang-format off
     typedef typename std::conditional<is_std_string_v,
                                        __str_char_type,
-                                       std::conditional_t<is_std_string_view_v,
+                                       typename std::conditional<is_std_string_view_v,
                                                           __str_vw_char_type,
-                                                          std::conditional_t<is_char_pointer_v,
+                                                          typename std::conditional<is_char_pointer_v,
                                                                              __pchr_char_type,
-                                                                             __Achr_char_type>>>::type char_type;
+                                                                             __Achr_char_type>::type>::type>::type char_type;
     // clang-format on
 };
 
@@ -378,32 +402,6 @@ using is_string_t = typename is_string<T>::type;
 template <typename T>
 bool constexpr is_string_v = is_string<T>::value;
 
-// clang-format on
-
-// template<typename T>
-// struct is_string_type
-// : std::disjunction<std::is_convertible<T, std::string>,
-//                    std::is_convertible<T, std::wstring>,
-//                    std::is_convertible<T, std::u8string>,
-//                    std::is_convertible<T, std::u16string>,
-//                    std::is_convertible<T, std::u32string>,
-//                    std::is_convertible<T, std::string_view>,
-//                    std::is_convertible<T, std::wstring_view>,
-//                    std::is_convertible<T, std::u8string_view>,
-//                    std::is_convertible<T, std::u16string_view>,
-//                    std::is_convertible<T, std::u32string_view>,
-//                    std::is_convertible<T, const char*>,
-//                    std::is_convertible<T, const wchar_t*>,
-//                    std::is_convertible<T, const char16_t*>,
-//                    std::is_convertible<T, const char32_t*>,
-//                    std::is_array<T>,
-//                    std::is_same<T, char*>,
-//                    std::is_same<T, wchar_t*>,
-//                    std::is_same<T, char16_t*>,
-//                    std::is_same<T, char32_t*>>
-// {
-// };
-
 template <typename StringT1_, typename StringT2_>
 struct is_compatible_string
 {
@@ -411,7 +409,7 @@ struct is_compatible_string
     static constexpr bool is_string_2    = is_string_v<StringT2_>;
     using char_type_1                    = typename is_string<StringT1_>::char_type;
     using char_type_2                    = typename is_string<StringT2_>::char_type;
-    static constexpr bool same_char_type = std::is_same_v<char_type_1, char_type_2>;
+    static constexpr bool same_char_type = std::is_same<char_type_1, char_type_2>::value;
 
     constexpr static bool value = is_string_1 && is_string_2 && same_char_type;
     typedef typename std::conditional<value, char_type_1, void>::type type;
@@ -493,6 +491,6 @@ using has_std_hash_t = typename has_std_hash<Type>::type;
 template <typename Type>
 constexpr bool has_std_hash_v = has_std_hash<Type>::value;
 
-}; //  namespace util
+} //  namespace util
 
 #endif // TRAITS_H_INCLUDED
