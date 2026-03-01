@@ -1,3 +1,5 @@
+![TypeTraits Banner](assets/banners/type_traits_banner.svg)
+
 # TypeTraits
 
 Header-only C++ type-trait helpers for compile-time introspection.
@@ -50,3 +52,8 @@ Include the file in your code e.g:
 ```c++
 #include <dkyb/traits.h>
 ```
+
+## Powered by
+Reduce the smells, keep on top of code-quality. Sonar Qube is run on every push to the `main` branch on GitHub.
+
+[![SonarQubeCloud](assets/icons/logo-sonarqube-cloud-small.png)](https://sonarcloud.io/project/overview?id=kingkybel_TypeTraits)
