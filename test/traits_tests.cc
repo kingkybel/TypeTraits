@@ -321,7 +321,7 @@ struct StaticMemberMismatch
 
 struct MemberMatch
 {
-    bool fill()
+    bool fill() // NOSONAR
     {
         return true;
     }

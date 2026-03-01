@@ -109,7 +109,7 @@
                                                                                                                        \
     template <typename U> inline constexpr bool traitsName##_v = traitsName<U>::value;
 
-///**
+///** NOSONAR
 // * @usage add this macro to your project with the first parameter the name
 // * you want to give the trait and the second the name of the member function
 // * whose presence you wish to assert
