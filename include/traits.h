@@ -365,7 +365,7 @@ template <typename StringT1_, typename StringT2_> struct is_compatible_string
     static constexpr bool is_string_2    = is_string_v<StringT2_>;
     using char_type_1                    = typename is_string<StringT1_>::char_type;
     using char_type_2                    = typename is_string<StringT2_>::char_type;
-    static constexpr bool same_char_type = std::is_same<char_type_1, char_type_2>::value;
+    static constexpr bool same_char_type = std::is_same_v<char_type_1, char_type_2>;
 
     constexpr static bool value = is_string_1 && is_string_2 && same_char_type;
     using type                  = std::conditional_t<value, char_type_1, void>;
