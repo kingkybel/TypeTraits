@@ -31,9 +31,6 @@
 #include <type_traits>
 #include <utility>
 
-namespace util
-{
-
 /**
  * @brief Macro to make it a bit easier to define a trait to check whether a class has a static member of a given
  * signature.
@@ -60,20 +57,18 @@ namespace util
  * @endcode
  */
 #define DEFINE_HAS_STATIC_MEMBER_FUNCTION(traitsName, funcName, signature)                                             \
-    template <typename U>                                                                                              \
-    class traitsName                                                                                                   \
+    template <typename U> class traitsName                                                                             \
     {                                                                                                                  \
       private:                                                                                                         \
-        template <typename T, T>                                                                                       \
-        struct helper;                                                                                                 \
-        template <typename T>                                                                                          \
-        static std::uint8_t check(helper<signature, &funcName> *);                                                     \
-        template <typename T>                                                                                          \
-        static std::uint16_t check(...);                                                                               \
+        template <typename T, T> struct helper;                                                                        \
+        template <typename T> static std::uint8_t  check(helper<signature, &funcName> *);                              \
+        template <typename T> static std::uint16_t check(...);                                                         \
                                                                                                                        \
       public:                                                                                                          \
-        static constexpr bool value = sizeof(check<U>(0)) == sizeof(std::uint8_t);                                     \
-    };
+        static constexpr bool value = sizeof(check<U>(nullptr)) == sizeof(std::uint8_t);                               \
+    };                                                                                                                 \
+                                                                                                                       \
+    template <typename U> inline constexpr bool traitsName##_v = traitsName<U>::value;
 
 /**
  * @brief Macro to make it easier to define a trait to check whether a class has a non-static member function
@@ -101,18 +96,18 @@ namespace util
  * @endcode
  */
 #define DEFINE_HAS_MEMBER_FUNCTION(traitsName, funcName, signature)                                                    \
-    template <typename U>                                                                                              \
-    class traitsName                                                                                                   \
+    template <typename U> class traitsName                                                                             \
     {                                                                                                                  \
       private:                                                                                                         \
         template <typename T>                                                                                          \
         static auto check(T *) -> decltype(static_cast<signature>(&T::funcName), std::true_type());                    \
-        template <typename>                                                                                            \
-        static std::false_type check(...);                                                                             \
+        template <typename> static std::false_type check(...);                                                         \
                                                                                                                        \
       public:                                                                                                          \
-        static constexpr bool value = decltype(check<U>(0))::value;                                                    \
-    };
+        static constexpr bool value = decltype(check<U>(nullptr))();                                                   \
+    };                                                                                                                 \
+                                                                                                                       \
+    template <typename U> inline constexpr bool traitsName##_v = traitsName<U>::value;
 
 ///**
 // * @usage add this macro to your project with the first parameter the name
@@ -164,7 +159,5 @@ namespace util
 //        public:                                                                                       \
 //        static constexpr bool value = type::value;                                                    \
 //    };
-
-} // namespace util
 
 #endif // TRAITS_STATIC_H_INCLUDED

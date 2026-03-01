@@ -37,10 +37,12 @@ class TraitsTest : public ::testing::Test
   protected:
     void SetUp() override
     {
+        // just in case
     }
 
     void TearDown() override
     {
+        // just in case
     }
 };
 
@@ -56,7 +58,7 @@ TEST_F(TraitsTest, is_equality_comparable_test)
 
     struct Equal
     {
-        bool operator==(Equal const& rhs) const
+        bool operator==(Equal const& rhs) const // NOSONAR
         {
             return true;
         }
@@ -77,7 +79,7 @@ TEST_F(TraitsTest, is_less_comparable_test)
 
     struct Less
     {
-        bool operator<(Less const& rhs) const
+        bool operator<(Less const& rhs) // NOSONAR
         {
             return true;
         }
@@ -289,7 +291,7 @@ TEST_F(TraitsTest, charToChar_test)
 
 TEST_F(TraitsTest, is_char_pointer_const_pointer_test)
 {
-    using const_char_ptr_const = char const * const;
+    using const_char_ptr_const = char const* const;
     ASSERT_TRUE((is_char_pointer_v<const_char_ptr_const>));
 }
 
@@ -319,7 +321,7 @@ struct StaticMemberMismatch
 
 struct MemberMatch
 {
-    bool fill()
+    bool fill() const
     {
         return true;
     }
@@ -327,7 +329,7 @@ struct MemberMatch
 
 struct MemberMismatch
 {
-    double fill()
+    double fill() const
     {
         return 1.0;
     }
@@ -339,12 +341,12 @@ DEFINE_HAS_MEMBER_FUNCTION(has_bool_fill, fill, bool (T::*)(void))
 
 TEST_F(TraitsTest, has_static_member_function_macro_test)
 {
-    ASSERT_TRUE((has_static_bool_fill<StaticMemberMatch>::value));
-    ASSERT_FALSE((has_static_bool_fill<StaticMemberMismatch>::value));
+    ASSERT_TRUE((has_static_bool_fill_v<StaticMemberMatch>));
+    ASSERT_FALSE((has_static_bool_fill_v<StaticMemberMismatch>));
 }
 
 TEST_F(TraitsTest, has_member_function_macro_test)
 {
-    ASSERT_TRUE((has_bool_fill<MemberMatch>::value));
-    ASSERT_FALSE((has_bool_fill<MemberMismatch>::value));
+    ASSERT_TRUE((has_bool_fill_v<MemberMatch>));
+    ASSERT_FALSE((has_bool_fill_v<MemberMismatch>));
 }
