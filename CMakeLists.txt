@@ -10,6 +10,7 @@ include(GNUInstallDirs)
 include(CTest)
 
 dkyb_apply_common_settings(CXX_STANDARD 23)
+dkyb_update_submodules()
 
 execute_process(
         COMMAND bash -c "printf \"%s\" $(cat /etc/os-release | grep -E \"^ID=[^\\n]*|^VERSION_ID=[^\\n]*\" | cut -f2 -d= | tr -d '\"')"
