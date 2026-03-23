@@ -40,6 +40,24 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Restore gtest cache
+      uses: actions/cache@v4
+      with:
+        path: build/dkyb-cache
+        key: deps-gtest-1.17.1-${{ hashFiles('cmake/**') }}
+        restore-keys: |
+          deps-gtest-1.17.1-
+          deps-gtest-
+
+    - name: Restore boost cache
+      uses: actions/cache@v4
+      with:
+        path: build/dkyb-cache
+        key: deps-boost-1.90.0-${{ hashFiles('cmake/**') }}
+        restore-keys: |
+          deps-boost-1.90.0-
+          deps-boost-
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type

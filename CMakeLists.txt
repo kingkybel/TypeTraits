@@ -12,6 +12,15 @@ include(CTest)
 dkyb_apply_common_settings(CXX_STANDARD 23)
 dkyb_update_submodules()
 
+include(${CMAKE_SOURCE_DIR}/cmake-common/cmake/DkybDependency.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake-common/cmake/DkybDependencyRegistry.cmake)
+
+dkyb_dependency_lookup(gtest 1.17.1 BUILD_PREFIX gtest_install)
+list(APPEND CMAKE_PREFIX_PATH "${gtest_install}")
+
+dkyb_dependency_lookup(boost 1.90.0 BUILD_PREFIX boost_install)
+list(APPEND CMAKE_PREFIX_PATH "${boost_install}")
+
 execute_process(
         COMMAND bash -c "printf \"%s\" $(cat /etc/os-release | grep -E \"^ID=[^\\n]*|^VERSION_ID=[^\\n]*\" | cut -f2 -d= | tr -d '\"')"
         OUTPUT_VARIABLE LINUX_VERSION
