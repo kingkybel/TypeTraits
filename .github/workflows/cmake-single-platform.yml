@@ -14,19 +14,27 @@ env:
   BUILD_TYPE: RelWithDebInfo
 
 jobs:
-  cache-gtest:
+  gtest:
     uses: kingkybel/CMakeCommon/.github/workflows/dependency-cache.yml@main
     with:
       dependency-name: gtest
-      dependency-version: latest
-      build: true
+      dependency-version: 1.17.1
+
+  boost:
+    uses: kingkybel/CMakeCommon/.github/workflows/dependency-cache.yml@main
+    with:
+      dependency-name: boost
+      dependency-version: 1.90.0
 
   build:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-latest
-    needs: cache-gtest
+    needs: 
+      - gtest
+      - boost
+    
     steps:
     - uses: actions/checkout@v4
       with:
