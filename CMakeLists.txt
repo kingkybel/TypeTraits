@@ -17,6 +17,7 @@ include(${CMAKE_SOURCE_DIR}/cmake-common/cmake/DkybDependencyRegistry.cmake)
 
 dkyb_dependency_lookup(gtest 1.17.0 BUILD_PREFIX gtest_install)
 list(APPEND CMAKE_PREFIX_PATH "${gtest_install}")
+find_package(GTest REQUIRED)
 
 dkyb_dependency_lookup(boost 1.90.0 BUILD_PREFIX boost_install)
 list(APPEND CMAKE_PREFIX_PATH "${boost_install}")
