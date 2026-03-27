@@ -18,7 +18,7 @@ jobs:
     uses: kingkybel/CMakeCommon/.github/workflows/dependency-cache.yml@main
     with:
       dependency-name: gtest
-      dependency-version: 1.17.1
+      dependency-version: 1.17.0
 
   boost:
     uses: kingkybel/CMakeCommon/.github/workflows/dependency-cache.yml@main
