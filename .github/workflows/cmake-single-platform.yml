@@ -170,6 +170,15 @@ jobs:
           fetch-depth: 0
           submodules: 'recursive'
 
+      - name: Restore gtest cache
+        uses: actions/cache@v4
+        with:
+          path: build/dkyb-cache
+          key: deps-gtest-1.17.0-${{ hashFiles('cmake/**') }}
+          restore-keys: |
+            deps-gtest-1.17.0-
+            deps-gtest-
+
       - name: Install build tools
         run: |
           sudo apt-get update
