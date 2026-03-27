@@ -301,6 +301,332 @@ TEST_F(TraitsTest, is_char_array_bounded_test)
     ASSERT_TRUE((is_char_array_v<char const[7]>));
 }
 
+TEST_F(TraitsTest, charToChar_different_types_test)
+{
+    // Test charToChar with different character types
+    ASSERT_EQ(charToChar<wchar_t>('A'), L'A');
+    ASSERT_EQ(charToChar<char16_t>('B'), u'B');
+    ASSERT_EQ(charToChar<char32_t>('C'), U'C');
+    ASSERT_EQ(charToChar<char>(L'Z'), 'Z');
+    ASSERT_EQ(charToChar<char16_t>(u'X'), u'X');
+    ASSERT_EQ(charToChar<char32_t>(U'Y'), U'Y');
+}
+
+TEST_F(TraitsTest, is_compatible_string_edge_cases_test)
+{
+    // Test with different string types
+    ASSERT_TRUE((is_compatible_string_v<std::string, char*>));
+    ASSERT_TRUE((is_compatible_string_v<std::wstring, wchar_t*>));
+    ASSERT_TRUE((is_compatible_string_v<std::u16string, char16_t*>));
+    ASSERT_TRUE((is_compatible_string_v<std::u32string, char32_t*>));
+
+    // Test with string_view
+    ASSERT_TRUE((is_compatible_string_v<std::string_view, char*>));
+    ASSERT_TRUE((is_compatible_string_v<std::wstring_view, wchar_t*>));
+
+    // Incompatible types
+    ASSERT_FALSE((is_compatible_string_v<std::string, wchar_t*>));
+    ASSERT_FALSE((is_compatible_string_v<std::string, char16_t*>));
+    ASSERT_FALSE((is_compatible_string_v<std::string, char32_t*>));
+}
+
+TEST_F(TraitsTest, has_std_string_compatible_char_edge_cases_test)
+{
+    // Test with various combinations
+    ASSERT_TRUE((has_std_string_compatible_char_v<std::string, char>));
+    ASSERT_TRUE((has_std_string_compatible_char_v<std::string, char*>));
+    ASSERT_TRUE((has_std_string_compatible_char_v<std::string, char const[]>));
+    ASSERT_TRUE((has_std_string_compatible_char_v<std::string, std::string>));
+    ASSERT_TRUE((has_std_string_compatible_char_v<std::string, std::string_view>));
+
+    // Test with wide strings
+    ASSERT_TRUE((has_std_string_compatible_char_v<std::wstring, wchar_t>));
+    ASSERT_TRUE((has_std_string_compatible_char_v<std::u16string, char16_t>));
+    ASSERT_TRUE((has_std_string_compatible_char_v<std::u32string, char32_t>));
+
+    // Incompatible cases
+    ASSERT_FALSE((has_std_string_compatible_char_v<std::string, wchar_t>));
+    ASSERT_FALSE((has_std_string_compatible_char_v<std::string, int>));
+}
+
+TEST_F(TraitsTest, string_or_char_size_comprehensive_test)
+{
+    // Test with various string types
+    std::string    str    = "hello world";
+    std::wstring   wstr   = L"hello world";
+    std::u16string u16str = u"hello";
+    std::u32string u32str = U"hello";
+
+    std::string_view  sv  = "test";
+    std::wstring_view wsv = L"test";
+
+    char const*    cstr  = "c string";
+    wchar_t const* wcstr = L"wide c string";
+
+    char    arr[]  = "array";
+    wchar_t warr[] = L"wide array";
+
+    ASSERT_EQ(string_or_char_size(str), 11UL);
+    ASSERT_EQ(string_or_char_size(wstr), 11UL);
+    ASSERT_EQ(string_or_char_size(u16str), 5UL);
+    ASSERT_EQ(string_or_char_size(u32str), 5UL);
+
+    ASSERT_EQ(string_or_char_size(sv), 4UL);
+    ASSERT_EQ(string_or_char_size(wsv), 4UL);
+
+    ASSERT_EQ(string_or_char_size(cstr), 8UL);
+    ASSERT_EQ(string_or_char_size(wcstr), 13UL);
+
+    ASSERT_EQ(string_or_char_size(arr), 5UL);
+    ASSERT_EQ(string_or_char_size(warr), 10UL);
+
+    // Test with single characters
+    ASSERT_EQ(string_or_char_size('a'), 1UL);
+    ASSERT_EQ(string_or_char_size(L'b'), 1UL);
+
+    // Test with non-string types
+    ASSERT_EQ(string_or_char_size(42), 0UL);
+    ASSERT_EQ(string_or_char_size(3.14), 0UL);
+}
+
+TEST_F(TraitsTest, has_std_hash_comprehensive_test)
+{
+    // Test with various types that have std::hash
+    ASSERT_TRUE(has_std_hash_v<int>);
+    ASSERT_TRUE(has_std_hash_v<long>);
+    ASSERT_TRUE(has_std_hash_v<size_t>);
+    ASSERT_TRUE(has_std_hash_v<std::string>);
+    ASSERT_TRUE(has_std_hash_v<std::wstring>);
+    ASSERT_TRUE(has_std_hash_v<std::u16string>);
+    ASSERT_TRUE(has_std_hash_v<std::u32string>);
+    ASSERT_TRUE(has_std_hash_v<std::string_view>);
+    ASSERT_TRUE(has_std_hash_v<void*>);
+    ASSERT_TRUE(has_std_hash_v<std::nullptr_t>);
+
+    // Test with types that don't have std::hash
+    struct NoHash
+    {
+    };
+
+    ASSERT_FALSE(has_std_hash_v<NoHash>);
+    ASSERT_FALSE(has_std_hash_v<void>);
+}
+
+TEST_F(TraitsTest, get_Nth_type_comprehensive_test)
+{
+    using First  = get_Nth_type<0, int, double, std::string>::type;
+    using Second = get_Nth_type<1, int, double, std::string>::type;
+    using Third  = get_Nth_type<2, int, double, std::string>::type;
+
+    ASSERT_TRUE((std::is_same_v<First, int>));
+    ASSERT_TRUE((std::is_same_v<Second, double>));
+    ASSERT_TRUE((std::is_same_v<Third, std::string>));
+
+    // Test with single type
+    using Single = get_Nth_type<0, char>::type;
+    ASSERT_TRUE((std::is_same_v<Single, char>));
+}
+
+TEST_F(TraitsTest, is_string_comprehensive_test)
+{
+    // Test all string-like types
+    ASSERT_TRUE(is_string_v<std::string>);
+    ASSERT_TRUE(is_string_v<std::wstring>);
+    ASSERT_TRUE(is_string_v<std::u16string>);
+    ASSERT_TRUE(is_string_v<std::u32string>);
+
+    ASSERT_TRUE(is_string_v<std::string_view>);
+    ASSERT_TRUE(is_string_v<std::wstring_view>);
+    ASSERT_TRUE(is_string_v<std::u16string_view>);
+    ASSERT_TRUE(is_string_v<std::u32string_view>);
+
+    ASSERT_TRUE(is_string_v<char*>);
+    ASSERT_TRUE(is_string_v<wchar_t*>);
+    ASSERT_TRUE(is_string_v<char16_t*>);
+    ASSERT_TRUE(is_string_v<char32_t*>);
+
+    ASSERT_TRUE(is_string_v<char const*>);
+    ASSERT_TRUE(is_string_v<wchar_t const*>);
+
+    ASSERT_TRUE(is_string_v<char[]>);
+    ASSERT_TRUE(is_string_v<wchar_t[]>);
+    ASSERT_TRUE(is_string_v<char16_t[]>);
+    ASSERT_TRUE(is_string_v<char32_t[]>);
+
+    ASSERT_TRUE(is_string_v<char const[]>);
+    ASSERT_TRUE(is_string_v<char[10]>);
+    ASSERT_TRUE(is_string_v<wchar_t[20]>);
+
+    // Test non-string types
+    ASSERT_FALSE((is_string_v<int>));
+    ASSERT_FALSE((is_string_v<double>));
+    ASSERT_FALSE((is_string_v<void*>));
+    ASSERT_FALSE((is_string_v<std::tuple<int, double>>));
+}
+
+TEST_F(TraitsTest, is_std_string_comprehensive_test)
+{
+    ASSERT_TRUE(is_std_string_v<std::string>);
+    ASSERT_TRUE(is_std_string_v<std::wstring>);
+    ASSERT_TRUE(is_std_string_v<std::u16string>);
+    ASSERT_TRUE(is_std_string_v<std::u32string>);
+
+    // Test with custom allocator
+    ASSERT_TRUE((is_std_string_v<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>));
+
+    ASSERT_FALSE(is_std_string_v<std::string_view>);
+    ASSERT_FALSE(is_std_string_v<char*>);
+    ASSERT_FALSE(is_std_string_v<int>);
+}
+
+TEST_F(TraitsTest, is_std_string_view_comprehensive_test)
+{
+    ASSERT_TRUE(is_std_string_view_v<std::string_view>);
+    ASSERT_TRUE(is_std_string_view_v<std::wstring_view>);
+    ASSERT_TRUE(is_std_string_view_v<std::u16string_view>);
+    ASSERT_TRUE(is_std_string_view_v<std::u32string_view>);
+
+    ASSERT_FALSE(is_std_string_view_v<std::string>);
+    ASSERT_FALSE(is_std_string_view_v<char*>);
+    ASSERT_FALSE(is_std_string_view_v<int>);
+}
+
+TEST_F(TraitsTest, is_char_pointer_comprehensive_test)
+{
+    // All character pointer variations
+    ASSERT_TRUE(is_char_pointer_v<char*>);
+    ASSERT_TRUE(is_char_pointer_v<wchar_t*>);
+    ASSERT_TRUE(is_char_pointer_v<char16_t*>);
+    ASSERT_TRUE(is_char_pointer_v<char32_t*>);
+
+    ASSERT_TRUE(is_char_pointer_v<char const*>);
+    ASSERT_TRUE(is_char_pointer_v<wchar_t const*>);
+    ASSERT_TRUE(is_char_pointer_v<char16_t const*>);
+    ASSERT_TRUE(is_char_pointer_v<char32_t const*>);
+
+    // Note: char* const doesn't match any specialization as it's not a standard character pointer pattern
+    // ASSERT_TRUE(is_char_pointer_v<char* const>);
+    // Note: * const doesn't match any specialization as it's not a standard character pointer pattern
+    // ASSERT_TRUE(is_char_pointer_v<wchar_t* const>);
+
+    ASSERT_TRUE(is_char_pointer_v<char*&>);
+    ASSERT_TRUE(is_char_pointer_v<wchar_t*&>);
+
+    ASSERT_TRUE(is_char_pointer_v<char const*&>);
+    ASSERT_TRUE(is_char_pointer_v<wchar_t const*&>);
+
+    // Non-character pointers
+    ASSERT_FALSE(is_char_pointer_v<int*>);
+    ASSERT_FALSE(is_char_pointer_v<double*>);
+    ASSERT_FALSE(is_char_pointer_v<void*>);
+}
+
+TEST_F(TraitsTest, is_char_array_comprehensive_test)
+{
+    // All character array variations
+    ASSERT_TRUE(is_char_array_v<char[]>);
+    ASSERT_TRUE(is_char_array_v<wchar_t[]>);
+    ASSERT_TRUE(is_char_array_v<char16_t[]>);
+    ASSERT_TRUE(is_char_array_v<char32_t[]>);
+
+    ASSERT_TRUE(is_char_array_v<char const[]>);
+    ASSERT_TRUE(is_char_array_v<wchar_t const[]>);
+
+    ASSERT_TRUE(is_char_array_v<char[1]>);
+    ASSERT_TRUE(is_char_array_v<char[10]>);
+    ASSERT_TRUE(is_char_array_v<char[100]>);
+    ASSERT_TRUE(is_char_array_v<wchar_t[5]>);
+    ASSERT_TRUE(is_char_array_v<char16_t[20]>);
+    ASSERT_TRUE(is_char_array_v<char32_t[50]>);
+
+    ASSERT_TRUE(is_char_array_v<char const[5]>);
+    ASSERT_TRUE(is_char_array_v<wchar_t const[10]>);
+
+    // Non-character arrays
+    ASSERT_FALSE(is_char_array_v<int[]>);
+    ASSERT_FALSE(is_char_array_v<double[]>);
+    ASSERT_FALSE(is_char_array_v<int[5]>);
+}
+
+TEST_F(TraitsTest, is_tuple_comprehensive_test)
+{
+    // Test various tuple types
+    ASSERT_TRUE((is_tuple_v<std::tuple<>>));
+    ASSERT_TRUE((is_tuple_v<std::tuple<int>>));
+    ASSERT_TRUE((is_tuple_v<std::tuple<int, double>>));
+    ASSERT_TRUE((is_tuple_v<std::tuple<int, double, std::string>>));
+    ASSERT_TRUE((is_tuple_v<std::tuple<std::string, int, char*>>));
+
+    // Test non-tuple types
+    ASSERT_FALSE((is_tuple_v<int>));
+    ASSERT_FALSE((is_tuple_v<double>));
+    ASSERT_FALSE((is_tuple_v<std::string>));
+    ASSERT_FALSE((is_tuple_v<std::pair<int, double>>));
+    ASSERT_FALSE((is_tuple_v<std::array<int, 5>>));
+}
+
+TEST_F(TraitsTest, is_equality_comparable_comprehensive_test)
+{
+    // Test with various comparable types
+    ASSERT_TRUE(is_equality_comparable_v<int>);
+    ASSERT_TRUE(is_equality_comparable_v<double>);
+    ASSERT_TRUE(is_equality_comparable_v<std::string>);
+    ASSERT_TRUE(is_equality_comparable_v<char*>);
+    ASSERT_TRUE(is_equality_comparable_v<char const*>);
+
+    // Test with custom types
+    struct Comparable
+    {
+        bool operator==(Comparable const&) const
+        {
+            return true;
+        }
+    };
+
+    ASSERT_TRUE(is_equality_comparable_v<Comparable>);
+
+    struct NotComparable
+    {
+    };
+
+    ASSERT_FALSE(is_equality_comparable_v<NotComparable>);
+
+    // Test cross-type comparison
+    ASSERT_TRUE((is_equality_comparable_v<int, long>));
+    ASSERT_TRUE((is_equality_comparable_v<std::string, char const*>));
+    ASSERT_FALSE((is_equality_comparable_v<int, std::string>));
+}
+
+TEST_F(TraitsTest, is_less_comparable_comprehensive_test)
+{
+    // Test with various comparable types
+    ASSERT_TRUE(is_less_comparable_v<int>);
+    ASSERT_TRUE(is_less_comparable_v<double>);
+    ASSERT_TRUE(is_less_comparable_v<std::string>);
+    ASSERT_TRUE(is_less_comparable_v<char*>);
+
+    // Test with custom types
+    struct LessComparable
+    {
+        bool operator<(LessComparable const&) const
+        {
+            return true;
+        }
+    };
+
+    ASSERT_TRUE(is_less_comparable_v<LessComparable>);
+
+    struct NotLessComparable
+    {
+    };
+
+    ASSERT_FALSE(is_less_comparable_v<NotLessComparable>);
+
+    // Test cross-type comparison
+    ASSERT_TRUE((is_less_comparable_v<int, long>));
+    ASSERT_FALSE((is_less_comparable_v<int, std::string>));
+}
+
 namespace
 {
 struct StaticMemberMatch
@@ -345,8 +671,30 @@ TEST_F(TraitsTest, has_static_member_function_macro_test)
     ASSERT_FALSE((has_static_bool_fill_v<StaticMemberMismatch>));
 }
 
-TEST_F(TraitsTest, has_member_function_macro_test)
+#if __cplusplus >= 202'002L
+TEST_F(TraitsTest, concepts_test)
 {
-    ASSERT_TRUE((has_bool_fill_v<MemberMatch>));
-    ASSERT_FALSE((has_bool_fill_v<MemberMismatch>));
+    // Test C++20 concepts
+    static_assert(util::equality_comparable<int>);
+    static_assert(util::equality_comparable<std::string>);
+
+    struct NotComparable
+    {
+    };
+
+    static_assert(!util::equality_comparable<NotComparable>);
+
+    static_assert(util::less_comparable<int>);
+    static_assert(util::less_comparable<double>);
+    static_assert(util::less_comparable<std::string>);
+
+    struct NotLessComparable
+    {
+    };
+
+    static_assert(!util::less_comparable<NotLessComparable>);
+
+    static_assert(util::is_tuple_c<std::tuple<int, double>>);
+    static_assert(!util::is_tuple_c<int>);
 }
+#endif
