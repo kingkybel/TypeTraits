@@ -16,7 +16,9 @@ include(${CMAKE_SOURCE_DIR}/cmake-common/cmake/DkybDependency.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake-common/cmake/DkybDependencyRegistry.cmake)
 
 # When using cached dependencies from the workflow, manually set the cache paths
+# The cache root can be set via DKYB_DEPENDENCY_CACHE_ROOT environment variable or CMake parameter
 dkyb_dependency_cache_root(_cache_root)
+message(STATUS "Using dependency cache root: ${_cache_root}")
 list(APPEND CMAKE_PREFIX_PATH "${_cache_root}/gtest/1_17_0/install")
 find_package(GTest REQUIRED)
 

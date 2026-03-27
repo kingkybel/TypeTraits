@@ -51,7 +51,7 @@ jobs:
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DDKYB_DEPENDENCY_CACHE_ROOT=${{github.workspace}}/build/dkyb-cache
 
     - name: Build
       # Build your program with the given configuration
@@ -74,6 +74,15 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Restore gtest cache
+      uses: actions/cache@v4
+      with:
+        path: build/dkyb-cache
+        key: deps-gtest-1.17.0-${{ hashFiles('cmake/**') }}
+        restore-keys: |
+          deps-gtest-1.17.0-
+          deps-gtest-
+
     - name: Install lcov
       run: |
         sudo apt-get update
@@ -81,7 +90,7 @@ jobs:
 
     - name: Configure CMake (coverage)
       run: |
-        cmake -B ${{github.workspace}}/${{env.BUILD_DIR}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        cmake -B ${{github.workspace}}/${{env.BUILD_DIR}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DDKYB_DEPENDENCY_CACHE_ROOT=${{github.workspace}}/build/dkyb-cache
 
     - name: Build (coverage)
       run: cmake --build ${{github.workspace}}/${{env.BUILD_DIR}} --config ${{env.BUILD_TYPE}}
@@ -174,7 +183,7 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -S . -B "${{env.BUILD_DIR}}" -G Ninja -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          cmake -S . -B "${{env.BUILD_DIR}}" -G Ninja -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DDKYB_DEPENDENCY_CACHE_ROOT=${{github.workspace}}/build/dkyb-cache
 
       - name: Build (captured by build-wrapper)
         run: |
