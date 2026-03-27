@@ -15,12 +15,10 @@ dkyb_update_submodules()
 include(${CMAKE_SOURCE_DIR}/cmake-common/cmake/DkybDependency.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake-common/cmake/DkybDependencyRegistry.cmake)
 
-dkyb_dependency_lookup(gtest 1.17.0 BUILD_PREFIX gtest_install)
-list(APPEND CMAKE_PREFIX_PATH "${gtest_install}")
+# When using cached dependencies from the workflow, manually set the cache paths
+dkyb_dependency_cache_root(_cache_root)
+list(APPEND CMAKE_PREFIX_PATH "${_cache_root}/gtest/1_17_0/install")
 find_package(GTest REQUIRED)
-
-dkyb_dependency_lookup(boost 1.90.0 BUILD_PREFIX boost_install)
-list(APPEND CMAKE_PREFIX_PATH "${boost_install}")
 
 execute_process(
         COMMAND bash -c "printf \"%s\" $(cat /etc/os-release | grep -E \"^ID=[^\\n]*|^VERSION_ID=[^\\n]*\" | cut -f2 -d= | tr -d '\"')"
